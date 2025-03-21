@@ -1,7 +1,3 @@
-Here's your content clearly formatted as a `.md` file in English, suitable for your documentation:
-
----
-
 # 🔒 Secure Boot Configuration - LinuxSFL
 
 **[Linux Security Framework Layer – Zone 1: Physical]**
