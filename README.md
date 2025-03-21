@@ -1,12 +1,4 @@
-Claro! Abaixo está a versão em **inglês**, com a estrutura do projeto **LinuxSFL** organizada por **Zones** e **Layers**, incluindo para cada camada:
-
-- ✅ **Technology Used**  
-- 🛡️ **Security Barrier Created**  
-- ⚠️ **Potential Issue or Risk (commented)**
-
----
-
-## 🔐 **LinuxSFL – Linux Security Framework Layer**
+LinuxSFL – Linux Security Framework Layer
 
 ### 📁 `LinuxSFL/`
 ```plaintext
