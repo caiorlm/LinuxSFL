@@ -2,43 +2,67 @@
 
 This document describes recommended kernel parameters for security hardening on Linux systems, aimed at preventing exploits and protecting system information.
 
+---
+
 ## 🛠️ Recommended Kernel Security Parameters:
 
 Edit `/etc/sysctl.conf` or create custom files under `/etc/sysctl.d/*.conf`.
 
-### 1. Restrict Kernel Logs Access
+### 1. 🔒 Restrict Kernel Logs Access
+
+Protect sensitive kernel log information from unauthorized users.
+
 ```bash
 kernel.dmesg_restrict = 1
-Protects sensitive kernel log information.
+```
 
-2. Disable Magic SysRq Keys
-bash
-Copiar
-Editar
+---
+
+### 2. ⌨️ Disable Magic SysRq Keys
+
+Prevent unauthorized reboot, crash dumps, or debugging actions via keyboard shortcuts.
+
+```bash
 kernel.sysrq = 0
-Prevents unauthorized reboot and system dumps via keyboard.
+```
 
-3. Prevent IP Spoofing
-bash
-Copiar
-Editar
+---
+
+### 3. 🌐 Prevent IP Spoofing (Reverse Path Filtering)
+
+Enable reverse path filtering to validate packet sources and stop IP spoofing attacks.
+
+```bash
 net.ipv4.conf.all.rp_filter = 1
 net.ipv4.conf.default.rp_filter = 1
-Enables reverse-path filtering to stop IP spoofing.
+```
 
-4. Ignore ICMP Broadcast Requests
-bash
-Copiar
-Editar
+---
+
+### 4. 🚨 Ignore ICMP Broadcast Requests
+
+Reduce vulnerability to broadcast-based ICMP attacks, such as smurf attacks.
+
+```bash
 net.ipv4.icmp_echo_ignore_broadcasts = 1
-Reduces vulnerability to broadcast ping attacks.
+```
 
-✅ Applying changes:
-bash
-Copiar
-Editar
+---
+
+## ✅ Applying Changes:
+
+After adding or modifying parameters, apply the configuration:
+
+```bash
 sudo sysctl -p
-📌 Recommendations:
-Regularly audit applied settings.
-Document reasons for all deviations from default.
-Consider additional parameters based on environment specifics.
+```
+
+---
+
+## 📌 Recommendations:
+
+- Regularly audit applied settings (`sysctl -a`).
+- Document clearly all reasons for deviations from defaults.
+- Consider additional kernel parameters depending on your specific security needs and operational environment.
+
+---
