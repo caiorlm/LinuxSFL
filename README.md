@@ -147,14 +147,6 @@ LinuxSFL – Linux Security Framework Layer
 |                          | Layer 6   | Web Servers & Services         | nginx, apache, reverse proxy        |
 | **Cross-Zone**           | Layer 7   | Architecture & Documentation   | Diagrams, audit maps, setup guide   |
 
-Perfeito! Abaixo está a estrutura do projeto **LinuxSFL**, agora com **as únicas vulnerabilidades em destaque por zona**, ou seja:
-
-🔐 **Cada Zona** traz:
-- ✅ As tecnologias implementadas
-- 🛡️ A principal barreira de segurança criada
-- ⚠️ **A única vulnerabilidade possível** restante, assumindo que **tudo foi corretamente configurado** exceto um único ponto crítico **por camada ou zona**
-
----
 
 ## 🔰 **LinuxSFL – Highlighting the Single Remaining Vulnerability per Zone**
 
@@ -205,7 +197,6 @@ Even when everything is configured properly, physical tampering is still the fin
 
 🟢 **Zone 3 – Vulnerability Summary:**  
 **A missed brute-force pattern or expired TLS certificate can silently disable network trust layers**, exposing public services.
-
 
 
 ## ✅ Final Summary: *Most Likely Residual Vulnerability per Zone (Even if Fully Hardened)*
