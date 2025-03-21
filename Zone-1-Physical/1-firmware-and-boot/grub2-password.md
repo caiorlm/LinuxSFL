@@ -1,34 +1,63 @@
-# GRUB2 Password Protection - LinuxSFL 🔑
+# 🔑 GRUB2 Password Protection - LinuxSFL
 
-This document describes best practices to secure the GRUB2 bootloader by setting a password, preventing unauthorized users from editing boot parameters or accessing rescue modes.
+**[Linux Security Framework Layer – Zone 1: Physical]**
 
-## 🛡️ Setting GRUB2 Password:
+This document provides recommended security practices for protecting the **GRUB2** bootloader by configuring password protection. This approach prevents unauthorized users from editing boot parameters or gaining access to rescue and recovery modes.
 
-1. **Generate Secure Password Hash**
+---
 
-Use `grub2-mkpasswd-pbkdf2` to generate a hashed password:
+## 🛡️ Setting Up GRUB2 Password
+
+### Step 1: 🔑 Generate Secure Password Hash
+
+Use the command `grub2-mkpasswd-pbkdf2` to create a strong hashed password:
 
 ```bash
 grub2-mkpasswd-pbkdf2
+```
 
-Example output:
-  Enter password:
-  Reenter password:
-  PBKDF2 hash of your password is grub.pbkdf2.sha512.10000.ABC123...
-  
+**Example output:**
 
-Configure GRUB2 with Password
-  Edit /etc/grub.d/40_custom or /etc/grub.d/01_users and add:
+```bash
+Enter password:
+Reenter password:
+PBKDF2 hash of your password is grub.pbkdf2.sha512.10000.ABC123...
+```
 
+*Note*: Store the generated hash securely for the next step.
+
+---
+
+### Step 2: ⚙️ Configure GRUB2 with Password
+
+Edit the GRUB2 custom configuration file:
+
+- `/etc/grub.d/40_custom` *(recommended)*
+- Alternatively, `/etc/grub.d/01_users`
+
+Insert the following lines, replacing `admin` and the hash (`grub.pbkdf2.sha512.10000.ABC123...`) with your administrator username and the previously generated password hash:
+
+```bash
 set superusers="admin"
-  password_pbkdf2 admin grub.pbkdf2.sha512.10000.ABC123...
+password_pbkdf2 admin grub.pbkdf2.sha512.10000.ABC123...
+```
 
-Replace the hash with your generated value.
-  grub2-mkconfig -o /boot/grub2/grub.cfg
-(Location may vary depending on distribution)
+After updating, regenerate the GRUB2 configuration file:
 
-Recommendations:
-Use strong, unique passwords.
-Limit knowledge of GRUB password strictly to authorized administrators.
-Monitor /boot/grub2/grub.cfg permissions and audit regularly.
-[Linux Security Framework Layer – Zone 1: Physical]
+```bash
+grub2-mkconfig -o /boot/grub2/grub.cfg
+```
+
+*Note*: The path may vary depending on your Linux distribution (e.g., `/boot/efi/EFI/<distribution>/grub.cfg` for UEFI systems).
+
+---
+
+## ✅ Recommendations & Best Practices
+
+- **Strong Passwords**: Always use strong, unique passwords for GRUB2.
+- **Restrict Access**: Limit GRUB password knowledge strictly to authorized system administrators.
+- **Audit Regularly**: Regularly review permissions on `/boot/grub2/grub.cfg` and associated configuration files.
+
+---
+
+**[Linux Security Framework Layer – Zone 1: Physical]**
