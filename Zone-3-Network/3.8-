@@ -1,0 +1,98 @@
+# Zone 3 – Layer 08: IDS/IPS Presence (Low-Level Bash)
+
+## Objective
+Verify that host-based Intrusion Detection or Prevention Systems (IDS/IPS) are installed and running, such as Snort, Suricata, or OSSEC, using low-level Bash-only methods.
+
+## Key Checks
+- Detect presence and status of Snort
+- Detect presence and status of Suricata
+- Detect presence and status of OSSEC agent or server
+
+---
+
+## 1. Snort Detection
+
+### Script: `snort_detection.sh`
+```bash
+#!/bin/bash
+
+if pgrep snort &>/dev/null; then
+  echo "[PASS] Snort IDS is running."
+elif [ -f /etc/snort/snort.conf ]; then
+  echo "[WARN] Snort is installed but not running."
+else
+  echo "[FAIL] Snort not found."
+fi
+```
+
+---
+
+## 2. Suricata Detection
+
+### Script: `suricata_detection.sh`
+```bash
+#!/bin/bash
+
+if pgrep suricata &>/dev/null; then
+  echo "[PASS] Suricata is running."
+elif [ -f /etc/suricata/suricata.yaml ]; then
+  echo "[WARN] Suricata is installed but not running."
+else
+  echo "[FAIL] Suricata not found."
+fi
+```
+
+---
+
+## 3. OSSEC Detection
+
+### Script: `ossec_detection.sh`
+```bash
+#!/bin/bash
+
+if pgrep ossec-agentd &>/dev/null || pgrep ossec-execd &>/dev/null; then
+  echo "[PASS] OSSEC agent is active."
+elif [ -d /var/ossec ]; then
+  echo "[WARN] OSSEC appears installed but not running."
+else
+  echo "[FAIL] OSSEC not found."
+fi
+```
+
+---
+
+## Recommended Hardening
+- Run at least one host-level IDS tool
+- Ensure automatic startup and alerting is configured
+- Store alerts remotely if possible
+
+---
+
+## Output Sample
+```
+[FAIL] Snort not found.
+[PASS] Suricata is running.
+[WARN] OSSEC appears installed but not running.
+```
+
+---
+
+## Layer Status
+PASS if:
+- At least one IDS/IPS solution is active
+
+WARN if:
+- Installed but inactive
+
+FAIL if:
+- No detection of Snort, Suricata, OSSEC, or similar
+
+N/A if:
+- Not applicable due to network isolation or documented control
+
+---
+
+**Maintained by:** LinuxSFL Core Team  
+**License:** MIT  
+**Profile relevance:** web-server, api-gateway, bastion-host, military-infrastructure, nuclear-control, financial-app
+
