@@ -1,115 +1,151 @@
-# `LinuxSFL – Linux Security Framework Layer`
+# LinuxSFL – Linux Security Framework Layer
 
-> **Modular Linux security audit and hardening framework**  
-> 📦 Designed to analyze, reinforce, and monitor the most critical layers of a Linux system  
-> 🧱 Structured into security Zones and Layers for deep, targeted control
+**LinuxSFL** is a modular, zone-based, open-source framework to audit, harden, and validate Linux infrastructures across all security layers — from firmware and kernel to authentication, firewall, monitoring, and critical services.
+
+Designed to deliver structured compliance for environments like:
+- Web, Database, DNS, Email, API, CI/CD servers
+- Critical Infrastructures (Military, Nuclear, Government)
+- Public Cloud (AWS, Azure, GCP), Containers, and Bare Metal
+
+Its architecture is aligned with security standards including:
+- **CISA**, **NIST 800-53**, **ISO/IEC 27001**, **PCI DSS**, **HIPAA**, **CMMC**, and **CIS Controls**.
 
 ---
 
-## 🔰 Zones & Layers Overview
+## 🔰 Zones, Layers & Security Scope
+
+LinuxSFL divides security checks into **3 core zones**:
+
+| Zone | Scope                            | Example Layers                             |
+|------|----------------------------------|--------------------------------------------|
+| 1    | Physical / Firmware / Boot       | BIOS, GRUB2, Secure Boot, Kernel Modules   |
+| 2    | Operational / System / Users     | Users, Access Control, Audit, Backup       |
+| 3    | Network / Firewall / Monitoring  | Firewall, IDS, Logging, TLS, Redundancy    |
+
+Each zone includes **up to 10 layers**, each with a corresponding Bash script responsible for checking security posture and returning a status: `PASS`, `FAIL`, `WARN`, or `N/A`.
+
+---
+
+## 🧩 Directory Structure (Audit Engine)
 
 ```
-LinuxSFL/
-├── Zone-1-Physical/
-│   └── 1-firmware-and-boot/
-│       ├── bios-configuration.md
-│       ├── grub2-password.md
-│       └── secure-boot.md
-
-├── Zone-2-Operational/
-│   ├── 2-kernel-and-init/
-│   ├── 3-authentication-and-root/
-│   └── 4-mandatory-access-control/
-
-├── Zone-3-Network/
-│   ├── 5-firewall-and-monitoring/
-│   └── 6-web-servers-and-services/
-
-├── Transversal-Architecture-Documentation/
-│   └── 7-architecture-and-documentation/
-
-├── README.md
-└── LICENSE
+framework/
+├── audit.sh                  # Main entrypoint
+├── core/
+│   ├── detect_environment.sh
+│   ├── load_profile.sh
+│   ├── run_zone.sh
+│   ├── score_engine.sh
+│   └── report_output.sh
+├── profiles/
+│   └── server_profiles.yaml   # Profile weights + required layers
+├── logs/
+│   └── zoneX/layerY.log       # Logs for each layer
+├── reports/
+│   └── final_report_DATE.txt
+├── zone1/                     # Physical zone scripts
+├── zone2/                     # Operational zone scripts
+├── zone3/                     # Network zone scripts
 ```
 
 ---
 
-## 🧩 Layer Details
+## 📦 How It Works
 
-### 🟫 Zone 1 – Physical
-**Focus:** Boot-level and firmware integrity
+### Step-by-Step Audit Flow:
+1. `audit.sh` is executed
+2. **detect_environment.sh** gathers distro, virtualization/container/cloud, init, package manager (APT/YUM/DNF)
+3. User selects or passes the **server profile** (web-server, db-server, military, etc.)
+4. The framework loads its profile from `server_profiles.yaml`, including:
+   - Required standards (e.g. ISO 27001, PCI DSS)
+   - Layer weights (e.g. firewall = 10, audit = 10)
+   - Required configurations (e.g. auditd, TLS 1.2+, SSH hardened)
+5. All layers per zone are executed sequentially
+6. Results are scored, stored, and exported in `/reports` and `/logs`
 
-| File                    | Technology               | Barrier                                       | ⚠️ Risk |
-|-------------------------|--------------------------|-----------------------------------------------|--------|
-| `bios-configuration.md` | BIOS/UEFI settings       | Prevents physical tampering                   | CMOS reset bypasses security |
-| `grub2-password.md`     | GRUB2 password            | Prevents kernel boot-line tampering           | GRUB CLI access if `superuser` not set |
-| `secure-boot.md`        | Secure Boot + MOK        | Prevents unsigned bootloader/kernel loading   | MOK override with physical access |
-
-🟨 **Zone 1 Residual Risk:**  
-**A user with physical access can reset CMOS or boot from external media**, bypassing boot protection.
-
----
-
-### 🟦 Zone 2 – Operational  
-**Focus:** Kernel, authentication, and access control
-
-| Layer                        | Technology                  | Barrier                              | ⚠️ Risk |
-|-----------------------------|-----------------------------|--------------------------------------|--------|
-| `kernel-parameters.md`      | sysctl, cgroups, namespaces | Prevent kernel misuse                | Bad module or USB storage injection |
-| `authentication-and-root/`  | SSH config, sudo, users     | Blocks privilege abuse               | UID 0 backdoor account |
-| `mandatory-access-control/` | SELinux/AppArmor            | Enforces strict process isolation    | SELinux permissive = ineffective |
-
-🟨 **Zone 2 Residual Risk:**  
-**A hidden UID 0 user or permissive SELinux renders all other protections moot.**
+### Sample Output:
+```
+ZONE 2 - SYSTEM / USERS / SERVICES
+[✔] Layer 01 - User Management (OK) .............. 10/10
+[✘] Layer 04 - OS Hardening (FAIL) ............... 0/10
+    → Reason: /etc/sysctl.conf missing hardening flags
+```
 
 ---
 
-### 🟩 Zone 3 – Network  
-**Focus:** Network exposure and remote service hardening
+## 🧠 Dynamic Scoring Logic
 
-| Layer                       | Technology                  | Barrier                                  | ⚠️ Risk |
-|----------------------------|-----------------------------|------------------------------------------|--------|
-| `firewall-and-monitoring/` | firewalld, iptables, fail2ban| Prevent brute-force and port scanning    | Weak Fail2Ban regex or open SSH port |
-| `web-servers-and-services/`| nginx, Apache, TLS proxy     | Protect backend + enforce HTTPS          | Expired TLS fallback to HTTP |
-
-🟩 **Zone 3 Residual Risk:**  
-**Weak Fail2Ban filters or expired TLS certificates can silently expose your system.**
-
----
-
-## ✅ Summary: Zones, Layers & Focus Areas
-
-| Zone   | Layer | Name                         | Focus Area                             |
-|--------|-------|------------------------------|-----------------------------------------|
-| Zone 1 | 1     | Firmware and Boot            | BIOS, GRUB2, Secure Boot                |
-| Zone 2 | 2     | Kernel and Init              | sysctl, cgroups, systemd                |
-|        | 3     | Authentication & Root        | sudo, SSH, users                        |
-|        | 4     | Mandatory Access Control     | SELinux, AppArmor                       |
-| Zone 3 | 5     | Firewall and Monitoring       | firewalld, fail2ban, iptables           |
-|        | 6     | Web Servers & Services       | nginx, Apache, reverse proxy            |
-| Cross  | 7     | Architecture & Documentation | Visuals, hardening strategy, automation |
+- Each layer has a maximum **weight** defined by the selected profile
+- Layers return:
+  - ✔ PASS → Full weight
+  - ✘ FAIL → Zero weight
+  - ⚠ WARN → Partial weight
+  - 🟡 N/A → Removed from total score (e.g. BIOS check inside Docker)
+- Total score must reach **100%** per profile
+- **Zero tolerance** for critical failures in mandatory layers
 
 ---
 
-## 🧠 Final Insight
+## 📊 Interactive CLI Interface (soon: `sfltop`)
 
-> **LinuxSFL** does not aim to eliminate all risk — it **isolates**, **documents**, and **hardens** every attack surface layer by layer.  
-> The final responsibility is physical, behavioral, and human.
+Terminal-based dashboard for viewing zones, layers, scores, and logs:
+```
+┌────────────────────────────────────────────────────────┐
+│ LINUXSFL - AUDIT VIEWER (Profile: military-infra)      │
+├────────────────────────────────────────────────────────┤
+│ Zone 1: PHYSICAL                                       │
+│   [✔] Layer 01 - Inventory ................... 10/10   │
+│   [✔] Layer 03 - Kernel Modules .............. 10/10   │
+│                                                        │
+│ Zone 2: SYSTEM                                         │
+│   [✔] Layer 04 - Hardening ................... 10/10   │
+│   [✘] Layer 08 - Backup ....................... 0/10   │
+│     ↳ Press [Enter] to view failure log                │
+└────────────────────────────────────────────────────────┘
+```
+
+Navigation:
+- ↑↓ navigate between layers
+- [Enter] open log
+- [i] view standard (NIST/PCI/etc.)
+- [q] quit viewer
 
 ---
 
-## 🚧 Coming Soon
+## ✅ Profiles Included (examples)
+- **web-server** → PCI DSS, OWASP, ISO 27001
+- **db-server** → PCI DSS, ISO 27001, NIST 800-92
+- **military-infrastructure** → CMMC, NIST 800-53 High, CISA
+- **healthcare/hospital** → HIPAA, ISO 27799, NIST 800-66
+- **cloud-hyperscaler** → ISO 27017, CSA CCM
 
-- [ ] CLI-based audit runner
-- [ ] Interactive score panel (`slif-score.sh`)
-- [ ] Ansible/SSH-compatible deployment
-- [ ] Slack/Webhook alerts on vulnerability detection
+Each profile defines per-layer **weight**, **mandatory checks**, and linked **compliance frameworks**.
+
+---
+
+## 🧱 Goals of LinuxSFL
+- Modular, bash-only, extensible auditing system
+- Transparent logs per zone/layer
+- Real-time and post-audit visibility (interactive & static)
+- Score enforcement per critical environment
+- Profiles designed for **CISA-compliant** infrastructures
 
 ---
 
 ## 📜 License
-
-This project is licensed under the **MIT License**.  
-Feel free to use, fork, adapt, and contribute.
+MIT License — Free to use, fork, adapt, and contribute.
 
 ---
+
+## 📡 Coming Soon
+- CLI dashboard (`sfltop`) and auto-fix CLI options
+- GitHub Actions integration for CI compliance
+- Slack / Webhook notifications
+- Ansible-compatible module structure
+
+---
+
+## 🔒 Final Insight
+LinuxSFL is not just a checklist — it is a structured way to **control, harden, and validate security** layer-by-layer.
+
+🧠 "Security is not binary — it is layered, modular, and must be visible."
