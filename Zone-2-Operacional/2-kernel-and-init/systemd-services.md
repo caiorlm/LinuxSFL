@@ -2,54 +2,51 @@
 
 # Systemd Services Management - LinuxSFL ⚙️
 
-Este documento descreve as melhores práticas para configuração e gerenciamento de serviços críticos do **systemd** visando maior segurança, desempenho e estabilidade do sistema Linux.
-
-## ✅ Lista de Verificação de Serviços Essenciais
-
-Garanta que os seguintes serviços críticos estejam ativados e monitorados regularmente:
-
-| Serviço       | Descrição                    | Status Recomendado   |
-|---------------|------------------------------|----------------------|
-| `firewalld`   | Firewall dinâmico            | ✅ Ativado e rodando |
-| `sshd`        | Acesso remoto via SSH        | ✅ Ativado e seguro  |
-| `auditd`      | Registro de auditoria        | ✅ Ativado e rodando |
-| `fail2ban`    | Sistema prevenção de intrusão| ✅ Ativado e rodando |
+This document outlines best practices for configuring and managing critical **systemd** services to improve security, performance, and stability on Linux systems.
 
 ---
 
-## 🛠️ Comandos Úteis para Gerenciamento de Serviços
+## ✅ Essential Services Checklist
 
-### Verificar o status de um serviço:
+Ensure the following critical services are enabled and monitored regularly:
 
+| Service   | Description                  | Recommended Status           |
+|-----------|------------------------------|------------------------------|
+| `firewalld` | Dynamic Firewall Management | ✅ Enabled and Running      |
+| `sshd`    | SSH Remote Access            | ✅ Enabled and Secured      |
+| `auditd`  | Auditing and Logging         | ✅ Enabled and Running      |
+| `fail2ban`| Intrusion Prevention System  | ✅ Enabled and Running      |
+
+---
+
+## 🛠️ Useful Commands for Service Management
+
+**Check service status:**
 ```bash
-sudo systemctl status <nome_do_serviço>
+sudo systemctl status <service_name>
 ```
 
-### Ativar um serviço durante o boot:
-
+**Enable service on boot:**
 ```bash
-sudo systemctl enable <nome_do_serviço>
+sudo systemctl enable <service_name>
 ```
 
-### Desativar um serviço no boot:
-
+**Disable service on boot:**
 ```bash
-sudo systemctl disable <nome_do_serviço>
+sudo systemctl disable <service_name>
 ```
 
-### Iniciar ou reiniciar um serviço imediatamente:
-
+**Start or restart a service immediately:**
 ```bash
-sudo systemctl start <nome_do_serviço>
-sudo systemctl restart <nome_do_serviço>
+sudo systemctl start <service_name>
+sudo systemctl restart <service_name>
 ```
 
 ---
 
-## 🔍 Logs e Auditoria de Serviços:
+## 🔍 Service Logs and Auditing
 
-Inspecione logs com frequência usando `journalctl`:
-
+Inspect logs regularly using `journalctl`:
 ```bash
 sudo journalctl -u firewalld
 sudo journalctl -u sshd
@@ -57,25 +54,23 @@ sudo journalctl -u auditd
 sudo journalctl -u fail2ban
 ```
 
-Configure regras avançadas de auditoria para serviços críticos em:
-
+Configure advanced audit rules for critical services in:
 ```bash
 /etc/audit/rules.d/
 ```
 
 ---
 
-## 📌 Recomendações Importantes:
+## 📌 Important Recommendations
 
-- Audite regularmente os serviços ativos com:
-
+- Regularly audit active services:
 ```bash
 sudo systemctl list-units --type=service
 ```
 
-- Desative imediatamente quaisquer serviços desnecessários ou não utilizados.
-- Documente claramente qualquer exceção às políticas padrão.
+- Immediately disable any unnecessary or unused services.
+- Clearly document any exceptions to standard policies.
 
 ---
 
-**[Linux Security Framework Layer – Zone 2: Operational]**
+*[Linux Security Framework Layer – Zone 2: Operational]*
