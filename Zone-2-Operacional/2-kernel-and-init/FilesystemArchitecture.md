@@ -1,8 +1,5 @@
 ---
-
 # 📂 **Linux Root Filesystem Architecture (`/`) – LinuxSFL**
-
-**Zone 2: Operational**
 
 This document explains the Linux root filesystem, covering each primary directory’s purpose, typical contents, and their interactions during live system operation.
 
