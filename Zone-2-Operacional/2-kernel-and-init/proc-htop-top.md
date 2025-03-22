@@ -2,8 +2,6 @@
 
 # 📁 **Understanding `/proc` Filesystem and System Monitoring Tools (`htop` & `top`) – LinuxSFL**
 
-**Zone 2: Operational**
-
 This document explains the interaction of the **`/proc` filesystem** with key Linux monitoring tools (**`top`** and **`htop`**), their usage, differences, and recommendations for operational monitoring and troubleshooting.
 
 ---
