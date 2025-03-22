@@ -1,0 +1,121 @@
+# Zone 3 – Layer 07: Monitoring Agents and Telemetry (Low-Level Bash)
+
+## Objective
+Confirm the presence of basic monitoring agents and system telemetry tools to ensure visibility of system behavior, performance, and security events.
+
+## Key Checks
+- Check if standard monitoring agents are installed and running (Zabbix, Prometheus, Netdata)
+- Verify system log presence
+- Detect simple resource monitoring via process list
+
+---
+
+## 1. Zabbix Agent Detection
+
+### Script: `zabbix_agent_check.sh`
+```bash
+#!/bin/bash
+
+if pgrep zabbix_agentd &>/dev/null; then
+  echo "[PASS] Zabbix agent is running."
+else
+  echo "[FAIL] Zabbix agent not detected."
+fi
+```
+
+---
+
+## 2. Prometheus Node Exporter Detection
+
+### Script: `prometheus_node_exporter_check.sh`
+```bash
+#!/bin/bash
+
+if pgrep node_exporter &>/dev/null; then
+  echo "[PASS] Prometheus node exporter is active."
+else
+  echo "[FAIL] Prometheus node exporter not found."
+fi
+```
+
+---
+
+## 3. Netdata Check
+
+### Script: `netdata_check.sh`
+```bash
+#!/bin/bash
+
+if pgrep netdata &>/dev/null; then
+  echo "[PASS] Netdata is active."
+else
+  echo "[FAIL] Netdata not running."
+fi
+```
+
+---
+
+## 4. System Logs Present
+
+### Script: `syslog_presence_check.sh`
+```bash
+#!/bin/bash
+
+log_count=$(find /var/log -type f -name "*.log" | wc -l)
+
+if [ "$log_count" -gt 5 ]; then
+  echo "[PASS] System logs are present."
+else
+  echo "[WARN] Few or no logs found in /var/log."
+fi
+```
+
+---
+
+## 5. Basic Monitoring with ps/top
+
+### Script: `top_process_snapshot.sh`
+```bash
+#!/bin/bash
+
+echo "[INFO] Top 5 CPU-consuming processes:"
+ps -eo pid,comm,%cpu,%mem --sort=-%cpu | head -n 6
+```
+
+---
+
+## Recommended Hardening
+- Use at least one agent (Zabbix, Node Exporter, or Netdata)
+- Rotate and centralize logs if possible
+- Store metrics off-host for forensic resilience
+
+---
+
+## Output Sample
+```
+[PASS] Zabbix agent is running.
+[FAIL] Prometheus node exporter not found.
+[WARN] Few or no logs found in /var/log.
+[INFO] Top 5 CPU-consuming processes:
+  PID COMMAND %CPU %MEM
+  123 nginx   1.3   0.7
+```
+
+---
+
+## Layer Status
+PASS if:
+- At least one monitoring agent is active
+- Logs exist and are not empty
+- Basic telemetry can be queried
+
+FAIL if:
+- No monitoring solution present
+- Logs missing or corrupted
+
+---
+
+**Maintained by:** LinuxSFL Core Team  
+**License:** MIT  
+**Profile relevance:** web-server, monitoring-server, api-gateway, ci-cd, cloud-hyperscaler
+
